@@ -20,13 +20,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private Button btnFind;
     private EditText etFind;
 
-
+    private Marker point;
+    private LatLng place;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,12 +59,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if(!addresses.isEmpty()){
                 Double lat = (double)addresses.get(0).getLatitude();
                 Double lon = (double)addresses.get(0).getLongitude();
-                final LatLng place = new LatLng(lat, lon);
-                Marker point = mMap.addMarker(new MarkerOptions()
+                place = new LatLng(lat, lon);
+                point = mMap.addMarker(new MarkerOptions()
                 .position(place)
                 .title(text));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place, 15));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(16), 2000, null);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(place));
 
             }
 
@@ -85,10 +85,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        mMap.setOnMarkerClickListener(this);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
         // Add a marker in Sydney and move the camera
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 //        LatLng sydney = new LatLng(-34, 151);
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 50));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
+
+        return true;
     }
 }
